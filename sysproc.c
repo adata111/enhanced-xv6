@@ -26,6 +26,19 @@ sys_wait(void)
   return wait();
 }
 
+/******************************** waitx addition start ******************************/
+int
+sys_waitx(void)
+{
+  int *wtime, *rtime;
+  if(argptr(0, (char**)&wtime, sizeof(int))<0)
+    return -1;
+  if(argptr(1, (char**)&rtime, sizeof(int))<0)
+    return -1;
+  return waitx(wtime, rtime);
+}
+/******************************** waitx addition end ******************************/
+
 int
 sys_kill(void)
 {
@@ -88,4 +101,25 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+// print all processes
+//returns process number i.e. 23
+int
+sys_procs(void)
+{
+  return procs();
+}
+
+// changes the priority of a process
+// returns old priority of the process
+int
+sys_set_priority(void)
+{
+  int newPr, pid;
+  if(argint(0, &newPr)<0)
+    return -1;
+  if(argint(1, &pid)<0)
+    return -1;
+  return set_priority(newPr, pid);
 }

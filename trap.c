@@ -12,6 +12,8 @@
 struct gatedesc idt[256];
 extern uint vectors[];  // in vectors.S: array of 256 entry pointers
 struct spinlock tickslock;
+
+extern void resetPriority();
 uint ticks;
 
 void
@@ -51,8 +53,29 @@ trap(struct trapframe *tf)
     if(cpuid() == 0){
       acquire(&tickslock);
       ticks++;
+      updateWaittime();
       wakeup(&ticks);
       release(&tickslock);
+      /******************************** addition start ******************************/
+      if(myproc()) {
+        if(myproc()->state == RUNNING){
+          myproc()->rtime++;
+          myproc()->lastExec = ticks;
+        }
+        else if(myproc()->state == SLEEPING){
+          myproc()->iotime++;
+          myproc()->lastExec = ticks;
+        }
+
+    //    acquire(&tickslock);
+    //    #ifndef MLFQ
+    //    else if(myproc()->state == RUNNABLE)
+    //      myproc()->wtime = ticks - myproc()->lastExec;
+    //    #endif
+    //    release(&tickslock);
+      }
+      /******************************** addition end ******************************/
+
     }
     lapiceoi();
     break;
@@ -102,10 +125,27 @@ trap(struct trapframe *tf)
 
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
-  if(myproc() && myproc()->state == RUNNING &&
-     tf->trapno == T_IRQ0+IRQ_TIMER)
-    yield();
+  if(myproc() && myproc()->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER){
+    #ifdef MLFQ
+      if(myproc()->curr_ticks >= slice[myproc()->curq])
+      {
+        change_qflag(myproc());
+        myproc()->wtime=0;
+        yield();
+      }
 
+      else    
+      {
+        incr_curr_ticks(myproc());
+        
+      } 
+
+    #else
+    #ifndef FCFS
+      yield();
+    #endif
+    #endif
+  }
   // Check if the process has been killed since we yielded
   if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
     exit();

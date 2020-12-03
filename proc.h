@@ -49,6 +49,20 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  int priority;                // priority of the process
+  int nrun;                    // No. of times process was picked by scheduler
+  int curq;                    // current queue
+  int q[6];                    // number of ticks in each of the 5 queues
+  int ctime;                   // creation time
+  int etime;                   // end-time
+  int rtime;                   // total run time
+  int wtime;                   // wait time for CPU
+  int iotime;                  // time spent waiting for I/O
+  int ent;
+  int curr_ticks;
+  int change_q;
+  int lastExec;
 };
 
 // Process memory is laid out contiguously, low addresses first:

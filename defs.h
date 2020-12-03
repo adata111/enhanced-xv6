@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+int slice[5];
 
 // bio.c
 void            binit(void);
@@ -103,21 +104,28 @@ int             pipewrite(struct pipe*, char*, int);
 
 //PAGEBREAK: 16
 // proc.c
+
+void            change_qflag(struct proc* p);
 int             cpuid(void);
 void            exit(void);
 int             fork(void);
 int             growproc(int);
+void            incr_curr_ticks(struct proc *p);
 int             kill(int);
 struct cpu*     mycpu(void);
 struct proc*    myproc();
+int 			procs(void);
+int 			set_priority(int newPrio, int pid);
 void            pinit(void);
 void            procdump(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            setproc(struct proc*);
 void            sleep(void*, struct spinlock*);
+void			updateWaittime();
 void            userinit(void);
 int             wait(void);
+int             waitx(int*, int*);
 void            wakeup(void*);
 void            yield(void);
 
