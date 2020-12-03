@@ -658,7 +658,7 @@ scheduler(void)
           break;
 
         if(highP != 0 && p->state==RUNNABLE){
-          if(highP->pid == p->pid){
+          if(highP->priority == p->priority){
             c->proc = p;
           //  cprintf("Process %s with PID %d and priority %d running\n",p->name, p->pid, p->priority);
             switchuvm(p);
