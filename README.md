@@ -13,7 +13,7 @@ The files modified are:
 - wtime is the time spent by a process waiting for the CPU i.e. wtime = etime-ctime-rtime-iotime
 
 ### time
-time command has also been implemented. It takes a command as input and runs it using exec but uses waitc() instead of wait(). Thus at the end it prints rtime, wtime and status(status is same as that returned by wait())
+time command has also been implemented. It takes a command as input and runs it using exec but uses waitx() instead of wait(). Thus at the end it prints rtime, wtime and status(status is same as that returned by wait())
 
 ### ps
 ps is a user program that prints the details of all the processes in the process table. This is accomplished by calling the system call procs() that I have implemented in proc.c. This syscall procs() loops over all processes in the process table and prints their information if they have a pid>0. 
